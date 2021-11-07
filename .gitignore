@@ -1,6 +1,7 @@
 api.key
 user.agent
 cache.gz
+data/raw/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
