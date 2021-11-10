@@ -3,7 +3,6 @@ import os
 import shutil
 import json
 import pandas as pd
-import urllib.parse
 from config import is_team, players_per_team
 from utils import winner_from_scores
 
@@ -74,7 +73,7 @@ def main():
                 'parent' : raw_match.get('parent'),
                 'comment' : raw_match.get('extradata', {}).get('comment') if raw_match.get('extradata') else None,
                 'ffa' : raw_match.get('extradata', {}).get('ffa') if raw_match.get('extradata') else None,
-                'url' : urllib.parse.quote_plus('https://liquipedia.net/' + raw_match['pagename'])
+                'url' : f'https://liquipedia.net/{wiki}/' +raw_match['pagename'].replace("'", '%27')
             }
             matches.append(match)
 
