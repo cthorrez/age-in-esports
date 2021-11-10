@@ -2,6 +2,7 @@ api.key
 user.agent
 cache.gz
 data/raw/*
+.vscode/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
