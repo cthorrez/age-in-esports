@@ -1,10 +1,17 @@
+# list of wikis to get data from
+wikis = ['callofduty', 'counterstrike', 'starcraft', 'starcraft2', 'rocketleague', 'smash', \
+         'overwatch', 'rainbowsix', 'leagueoflegends', 'valorant', 'warcraft', 'dota2', ]
+
+# same as above with smash split between melee and ultimate
+games = ['callofduty', 'counterstrike', 'starcraft', 'starcraft2', 'rocketleague', 'overwatch', \
+         'smash_melee', 'smash_ultimate', 'rainbowsix', 'leagueoflegends', 'valorant', 'warcraft', 'dota2', ]
+
 # maps game title to a boolean representing whether it is a team game or not
 is_team = {
     'starcraft' : False,
     'starcraft2' : False,
     'warcraft' : False,
     'smash' : False,
-    'fighters' : False,
     'rocketleague' : True,
     'counterstrike' : True,
     'valorant' : True,

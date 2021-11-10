@@ -3,7 +3,7 @@ import os
 import shutil
 import json
 import pandas as pd
-from config import is_team, players_per_team
+from config import wikis, is_team, players_per_team
 from utils import winner_from_scores
 
 pd.set_option('display.max_colwidth', None)
@@ -12,25 +12,21 @@ pd.set_option('display.width', 0)
 
 
 def main():
-    wikis = ['callofduty', 'counterstrike', 'starcraft', 'starcraft2', 'rocketleague', 'smash', \
-             'overwatch', 'rainbowsix', 'leagueoflegends', 'valorant', 'warcraft', 'dota2', ]
-    
     if not os.path.exists('data/processed'):
         os.makedirs('data/processed')
 
     shutil.rmtree('data/need_fixing', )
     os.makedirs('data/need_fixing')
 
-    # wikis = ['leagueoflegends', 'callofduty', 'overwatch', 'warcraft', 'valorant', 'starcraft', \
-    #          'starcraft2', 'smash', 'counterstrike', 'rocketleague', 'rainbowsix']
-
-    # wikis = ['rocketleague', 'rainbowsix', 'dota2']
-
     for wiki in wikis:
         players_raw = json.load(open(f'data/raw/{wiki}_players.json', 'rb'))
-        player_df = pd.DataFrame(players_raw)[['id', 'birthdate']]
-        player_df.to_csv(f'data/processed/{wiki}_players.csv', index=False)
+        player_df = pd.DataFrame(players_raw)[['pagename', 'birthdate']]
         print(len(player_df), wiki, 'players')
+        if wiki != 'smash':
+            player_df.to_csv(f'data/processed/{wiki}_players.csv', index=False)
+        else:
+            player_df.to_csv(f'data/processed/smash_melee_players.csv', index=False)
+            player_df.to_csv(f'data/processed/smash_ultimate_players.csv', index=False)
 
         matches_raw = json.load(open(f'data/raw/{wiki}_matches.json', 'rb'))
         matches = []
@@ -78,7 +74,8 @@ def main():
             matches.append(match)
 
         match_df = pd.DataFrame(matches)
-
+        match_df['date'] = pd.to_datetime(match_df['date'])
+        
         if len(bad_cs) > 0:
             print(len(bad_cs), 'incomplete teams')
             json.dump(bad_cs, open(f'data/need_fixing/{wiki}_incomplete_team.json', 'w'), indent=2)
@@ -101,7 +98,7 @@ def main():
         match_df['winner'] = match_df.apply(lambda row: row['winner'] if row['winner'] else row['score_winner'], axis=1)
 
         # drop rows with bad date column
-        match_df = match_df[~match_df['date'].str.contains('1970-01-01')]
+        match_df = match_df[~match_df['date'].astype(str).str.contains('1970-01-01')]
 
         # if winner col is empty and scores are equal drop the row, who the hell knows what happened there
         match_df = match_df[~match_df['winner'].isnull()]
@@ -152,6 +149,8 @@ def main():
             match_df = match_df[~((match_df['team1score'] != 0) & (match_df['team2score'] != 0) & (match_df['team1score'] == match_df['team2score']))]
 
         if wiki == 'rainbowsix':
+            match_df = match_df[match_df['game'] != 'vegas2']
+            match_df = match_df[match_df['date'].dt.year > 2008]
             # in rainbox six they mark draws and forfeiths with winner = -1 I think
             match_df = match_df[match_df['winner'] != '-1']
             # they mark unknown scores as -1
@@ -177,6 +176,9 @@ def main():
             # lol...
             match_df = match_df[match_df['winner'] != 'Expression error: Unrecognized word "ff"']
 
+        if wiki == 'dota2':
+            match_df = match_df[match_df['date'].dt.year > 2008]
+
                
         bad_winner_mask = ((~match_df.winner.isnull()) & \
                           (match_df['score_winner'] != match_df['winner']) & \
@@ -197,20 +199,41 @@ def main():
         
         match_df = match_df[~bad_winner_mask]
         match_df = match_df[~match_df['winner'].isnull()]
-        match_df['date'] = pd.to_datetime(match_df['date'])
+        match_df['winner'] = match_df['winner'].astype(int)
         match_df = match_df.sort_values('date')
-                
+        if wiki != 'smash':
+            out_match_df = match_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'team1score', 'team2score', 'winner', 'url']]
+            out_match_df.to_csv(f'data/processed/{wiki}_matches.csv', index=False)
+        else:
+            melee_match_df = match_df[match_df['game'] == 'melee']
+            ultimate_match_df = match_df[match_df['game'] == 'ultimate']
+            melee_match_df = melee_match_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'team1score', 'team2score', 'winner', 'url']]
+            ultimate_match_df = ultimate_match_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'team1score', 'team2score', 'winner', 'url']]
+            melee_match_df.to_csv(f'data/processed/{wiki}_melee_matches.csv', index=False)
+            ultimate_match_df.to_csv(f'data/processed/{wiki}_ultimate_matches.csv', index=False)
+            print(len(melee_match_df), wiki, 'melee matches')
+            print(len(ultimate_match_df), wiki, 'ultimate matches')
+
+
         games = json.load(open(f'data/raw/{wiki}_games.json'))
         game_df = pd.DataFrame(games)
         game_df = pd.merge(match_df, game_df, on='matchid', how='inner', suffixes=['_match', '_game'])
-        game_df = game_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'winner_game', 'url']]
-        game_df = game_df.rename(columns={'winner_game' : 'winner'})
-        game_df.to_csv(f'data/processed/{wiki}_games.csv', index=False)
-    
-        
-        match_df = match_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'team1score', 'team2score', 'winner', 'url']]
-        match_df['winner'] = match_df['winner'].astype(int)
-        match_df.to_csv(f'data/processed/{wiki}_matches.csv', index=False)
+        game_df = game_df.rename(columns={'winner_game' : 'winner', 'game_match' : 'game'})
+
+        game_df = game_df.sort_values('date')
+        if wiki != 'smash':
+            print(game_df['winner'].unique().tolist())
+            game_df = game_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'winner', 'url']]
+            game_df.to_csv(f'data/processed/{wiki}_games.csv', index=False)
+        else:
+            melee_game_df = game_df[game_df['game'] == 'melee']
+            ultimate_game_df = game_df[game_df['game'] == 'ultimate']
+            melee_game_df = melee_game_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'team1score', 'team2score', 'winner', 'url']]
+            ultimate_game_df = ultimate_game_df[['date', 'team1', 'team2', 'team1players', 'team2players', 'team1score', 'team2score', 'winner', 'url']]
+            melee_game_df.to_csv(f'data/processed/{wiki}_melee_games.csv', index=False)
+            ultimate_game_df.to_csv(f'data/processed/{wiki}_ultimate_games.csv', index=False)
+            print(len(melee_game_df), wiki, 'melee games')
+            print(len(ultimate_game_df), wiki, 'ultimate games')
         
         print(len(match_df), wiki, 'matches')
         print(len(game_df), wiki, 'games')

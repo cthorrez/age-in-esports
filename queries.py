@@ -4,8 +4,8 @@
 player_query = {
     'version' : 'v2',
     'endpoint' : 'player',
-    'query' : 'id, alternateid, birthdate, nationality, status, earnings',
-    'conditions' : '[[status::!not player]] AND [[id::!Lin Guagua]]',
+    'query' : 'id, birthdate, pagename',
+    'conditions' : '[[status::!not player]]',
     'order' : 'id ASC'
 }
 ####################

@@ -4,30 +4,21 @@ import json
 from copy import deepcopy
 from lpdb_cache import LPDBCache
 from queries import player_query, match_query, game_query
+from config import wikis
 
 
 
 def main():
-    wikis = ['callofduty', 'starcraft', 'starcraft2', 'warcraft', 'rocketleague', 'smash', \
-             'overwatch', 'rainbowsix', 'counterstrike', 'valorant', 'leagueoflegends', 'dota2', ]
-
-    # wikis = ['callofduty', 'overwatch', 'warcraft', 'counterstrike', 'rainbowsix', 'smash']
-    # wikis = ['warcraft']
-
-    wikis = ['smash']
-
     # wikis = ['valorant', 'leagueoflegends', 'counterstrike'] + wikis
 
-    # wikis = ['starcraft2']
-
-    #NOT clashroyale, heroes, ageofempires
+    # wikis = ['leagueoflegends']
 
     if not os.path.exists('data/raw'):
         os.makedirs('data/raw/')
 
     limit = 5000
-    force_refresh = True
-    cache = LPDBCache(timeout=3, limit=limit)
+    force_refresh = False
+    cache = LPDBCache(timeout=10, limit=limit)
 
     for wiki in wikis:
         wiki_player_query = deepcopy(player_query)
