@@ -4,6 +4,10 @@ from copy import deepcopy
 from datetime import date
 from config import games
 
+def lower_first(player):
+    if not player : return player
+    return player[0].lower() + player[1:]
+
 def winner_from_scores(team1score, team2score):
     if team1score > team2score: return '1'
     if team2score > team1score: return '2'

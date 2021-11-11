@@ -15,7 +15,7 @@ match_query = {
     'version' : 'v1',
     'endpoint' : 'match',
     'query' : 'date, opponent1, opponent2, opponent1score, opponent2score, opponent1players, opponent2players, ' + \
-              'winner, mode, type, game, matchid, pageid, pagename, objectname, extradata',
+              'winner, mode, type, game, matchid, pageid, pagename, objectname, extradata, liquipediatier',
     'conditions' : '[[date::!1970-01-01]] AND [[date::!1000-01-01]] AND [[walkover::!1]] AND [[walkover::!2]]', 
     'order' : 'date ASC'
 }

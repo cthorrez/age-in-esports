@@ -11,14 +11,12 @@ from config import wikis
 def main():
     # wikis = ['valorant', 'leagueoflegends', 'counterstrike'] + wikis
 
-    # wikis = ['leagueoflegends']
-
     if not os.path.exists('data/raw'):
         os.makedirs('data/raw/')
 
     limit = 5000
     force_refresh = False
-    cache = LPDBCache(timeout=10, limit=limit)
+    cache = LPDBCache(timeout=2, limit=limit)
 
     for wiki in wikis:
         wiki_player_query = deepcopy(player_query)
@@ -31,7 +29,7 @@ def main():
         wiki_match_query = deepcopy(match_query)
         wiki_match_query['wiki'] = wiki
         if wiki == 'smash':
-            wiki_match_query['conditions'] += ' AND [[mode::singles]]'
+            wiki_match_query['conditions'] += ' AND [[mode::singles]] AND ([[game::melee]] OR [[game::ultimate]])'
         if wiki == 'counterstrike':
             wiki_match_query['query'] += ', parent'
 

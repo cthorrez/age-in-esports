@@ -2,9 +2,10 @@ from copy import deepcopy
 import os
 import shutil
 import json
+from numpy.testing._private.utils import print_assert_equal
 import pandas as pd
-from config import wikis, is_team, players_per_team
-from utils import winner_from_scores
+from config import wikis, game_info
+from utils import winner_from_scores, lower_first
 
 pd.set_option('display.max_colwidth', None)
 pd.set_option('display.max_rows', None)
@@ -21,6 +22,7 @@ def main():
     for wiki in wikis:
         players_raw = json.load(open(f'data/raw/{wiki}_players.json', 'rb'))
         player_df = pd.DataFrame(players_raw)[['pagename', 'birthdate']]
+        player_df['pagename'] = player_df['pagename'].map(lower_first)
         print(len(player_df), wiki, 'players')
         if wiki != 'smash':
             player_df.to_csv(f'data/processed/{wiki}_players.csv', index=False)
@@ -34,7 +36,7 @@ def main():
         for raw_match in matches_raw:
             team1 = raw_match['opponent1']
             team2 = raw_match['opponent2']
-            if is_team[wiki]:
+            if game_info[wiki]['team_size']:
                 if wiki == 'counterstrike' and ('p5' not in raw_match['opponent1players'] or 'p5' not in raw_match['opponent2players']):
                     bad_cs.append(raw_match)
                     continue
@@ -46,11 +48,14 @@ def main():
 
                 if not raw_match['opponent1players'] : continue
                 if not raw_match['opponent2players'] : continue
-                team1players = [raw_match['opponent1players'][f'p{x+1}'] for x in range(players_per_team[wiki]) if raw_match['opponent1players'][f'p{x+1}']]
-                team2players = [raw_match['opponent2players'][f'p{x+1}'] for x in range(players_per_team[wiki]) if raw_match['opponent2players'][f'p{x+1}']]
+                team1players = [raw_match['opponent1players'][f'p{x+1}'] for x in range(game_info[wiki]['team_size']) if raw_match['opponent1players'][f'p{x+1}']]
+                team2players = [raw_match['opponent2players'][f'p{x+1}'] for x in range(game_info[wiki]['team_size'])  if raw_match['opponent2players'][f'p{x+1}']]
             else:
                 team1players = [raw_match['opponent1']]
                 team2players = [raw_match['opponent2']]
+            
+            team1players = list(map(lower_first, team1players))
+            team2players = list(map(lower_first, team2players))
 
             match = {
                 'date' : raw_match['date'],
@@ -74,6 +79,7 @@ def main():
             matches.append(match)
 
         match_df = pd.DataFrame(matches)
+        print(match_df.columns)
         match_df['date'] = pd.to_datetime(match_df['date'])
         
         if len(bad_cs) > 0:
@@ -213,7 +219,7 @@ def main():
             ultimate_match_df.to_csv(f'data/processed/{wiki}_ultimate_matches.csv', index=False)
             print(len(melee_match_df), wiki, 'melee matches')
             print(len(ultimate_match_df), wiki, 'ultimate matches')
-
+        print(len(match_df), wiki, 'matches')
 
         games = json.load(open(f'data/raw/{wiki}_games.json'))
         game_df = pd.DataFrame(games)
@@ -235,7 +241,6 @@ def main():
             print(len(melee_game_df), wiki, 'melee games')
             print(len(ultimate_game_df), wiki, 'ultimate games')
         
-        print(len(match_df), wiki, 'matches')
         print(len(game_df), wiki, 'games')
         print('')
 
