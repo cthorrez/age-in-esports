@@ -72,7 +72,7 @@ def performance_distribution(game, events):
 
     xticks = [str(int(a)) for a in ages]
     xticks[0] = '<=' + xticks[0]
-    xticks[-1] += '<=' + xticks[-1] 
+    xticks[-1] += '<=' 
 
 
     plt.plot(ages, ratings, linewidth=3, label=game)
