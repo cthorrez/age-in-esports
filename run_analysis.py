@@ -16,8 +16,8 @@ def main():
     for game in group:
         events = get_player_match_events(game, recompute=False)
         events_list.append(events)
-        # career_distribution(game, events)
-        # performance_distribution(game, events)
+        career_distribution(game, events)
+        performance_distribution(game, events)
         age_distribution(game, events)
     age_over_time(group, events_list)
 

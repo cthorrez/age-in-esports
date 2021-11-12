@@ -29,7 +29,7 @@ def age_distribution(game, events):
     ages = events['age']
 
 
-    plt.hist(ages, bins=15, density=True)
+    plt.hist(ages, bins=12, density=True)
     plt.xlabel('age')
     plt.ylabel('density')
     plt.title(f'Age distribution for {game}')
