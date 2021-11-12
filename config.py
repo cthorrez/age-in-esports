@@ -16,33 +16,33 @@ game_info = {
     'starcraft': {
         'team_size' : None,
         'years' : [2000, 2021],
-        'ages' : [14, 36]
+        'ages' : [15, 34]
     },
     'starcraft2': {
         'team_size' : None,
         'years' : [2010, 2021],
-        'ages' : [14, 36]
+        'ages' : [14, 33]
     },
     'warcraft': {
         'team_size' : None,
         'years' : [2003, 2021],
-        'ages' : [14, 36] 
+        'ages' : [15, 33] 
     },
     'smash' : {
         'team_size': None
     },
     'smash_melee': {
         'years' : [2005, 2021],
-        'ages' : [14, 36]
+        'ages' : [16, 32]
     },
     'smash_ultimate': {
         'years': [2019, 2021],
-        'ages': [14, 32]
+        'ages': [17, 29]
     },
     'rocketleague': {
         'team_size' : 3,
         'years' : [2016, 2021],
-        'ages' : [13, 28]
+        'ages' : [14, 25]
     },
     'counterstrike': {
         'team_size': 5,
@@ -57,22 +57,22 @@ game_info = {
     'valorant' : {
         'team_size': 5,
         'years': [2020, 2021],
-        'ages': [16, 33]
+        'ages': [17, 29]
     },
     'rainbowsix': {
         'team_size': 4,
         'years': [2016, 2021],
-        'ages': [16, 32]
+        'ages': [18, 28]
     },
     'callofduty': {
         'team_size': 5,
         'years': [2014, 2021],
-        'ages': [16, 28]
+        'ages': [17, 26]
     },
     'leagueoflegends': {
         'team_size' : 5,
         'years': [2011, 2021],
-        'ages': [16, 28]
+        'ages': [16, 27]
     },
     'dota2': {
         'team_size': 5,

@@ -3,10 +3,22 @@ import pandas as pd
 from copy import deepcopy
 from datetime import date
 from config import games
+import itertools
+import math
+import trueskill
+
+def process_username(player):
+    if not player : return player
+    return lower_first(strip_quote(player))
 
 def lower_first(player):
-    if not player : return player
     return player[0].lower() + player[1:]
+
+def strip_quote(player):
+    if player[0] == "'" and player[-1] == "'":
+        return player.strip("'")
+    return player
+
 
 def winner_from_scores(team1score, team2score):
     if team1score > team2score: return '1'
@@ -28,3 +40,13 @@ class PlayerInfo:
         birthdate = date.fromisoformat(birthdate)
         age = int((date - birthdate).days // 365.25)
         return age
+
+
+# from https://github.com/sublee/trueskill/issues/1#issuecomment-149762508
+def win_probability(team1, team2):
+    delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
+    sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
+    size = len(team1) + len(team2)
+    denom = math.sqrt(size * (trueskill.BETA * trueskill.BETA) + sum_sigma)
+    ts = trueskill.global_env()
+    return ts.cdf(delta_mu / denom)
