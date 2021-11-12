@@ -4,14 +4,14 @@ import pandas as pd
 from ast import literal_eval
 from collections import defaultdict
 import trueskill
-from config import games, game_info, mobas, shooters, fighters, strategy, big
-from utils import PlayerInfo, win_probability
-from plots import age_over_time, career_distribution, performance_distribution, age_distribution
+from config import games, game_info, game_categories
+from utils import PlayerInfo, win_probability, retrieve_name
+from plots import age_over_time, career_distribution, performance_distribution, age_distribution, age_at_peak
 
 
 def main():
-    # games = ['counterstrike']
-    group = games
+    category = 'all'
+    group = game_categories[category]
     events_list = []
     for game in group:
         events = get_player_match_events(game, recompute=False)
@@ -19,7 +19,8 @@ def main():
         career_distribution(game, events)
         performance_distribution(game, events)
         age_distribution(game, events)
-    age_over_time(group, events_list)
+        age_at_peak(game, events)
+    age_over_time(category, group, events_list)
 
     
 
@@ -38,8 +39,8 @@ def get_player_match_events(game, recompute=True):
     info = PlayerInfo()
     matches = pd.read_csv(f'data/processed/{game}_matches.csv', converters={'team1players' : literal_eval, 'team2players' : literal_eval})
     print(f'using data on {len(matches)}, matches for {game}')
-    matches['date'] = pd.to_datetime(matches['date'])
-    matches['winner'] = matches['winner'].astype(int)
+    matches.loc[:, 'date'] = pd.to_datetime(matches['date'])
+    matches.loc[:, 'winner'] = matches['winner'].astype(int)
     matches = matches[(matches.date.dt.year >= game_info[game]['years'][0]) & \
                       (matches.date.dt.year <= game_info[game]['years'][1])]
 

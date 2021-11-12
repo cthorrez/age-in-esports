@@ -5,6 +5,7 @@ from datetime import date
 from config import games
 import itertools
 import math
+import inspect
 import trueskill
 
 def process_username(player):
@@ -18,6 +19,11 @@ def strip_quote(player):
     if player[0] == "'" and player[-1] == "'":
         return player.strip("'")
     return player
+
+# adapted from https://stackoverflow.com/questions/18425225/getting-the-name-of-a-variable-as-a-string
+def retrieve_name(var):
+    callers_local_vars = inspect.currentframe().f_back.f_locals.items()
+    return [var_name for var_name, var_val in callers_local_vars if var_val is var][0]
 
 
 def winner_from_scores(team1score, team2score):

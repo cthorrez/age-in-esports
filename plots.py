@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from config import game_info
 
-def age_over_time(games, events_list):
+def age_over_time(category, games, events_list):
     min_year = 9999
     max_year = 0
     for game, events in zip(games, events_list):
@@ -18,39 +18,63 @@ def age_over_time(games, events_list):
     
     plt.xlabel('year')
     plt.ylabel('average age')
-    # plt.title(f'Average age in {game}')
+    plt.title(f'Average age in {category} games over time')
     plt.xticks(np.arange(min_year, max_year+1))
-    plt.ylim((16, 30))
+    plt.ylim((16, 32))
     plt.legend()
     plt.show()
 
 def age_distribution(game, events):
     events = events[~events['age'].isnull()]
+    print(f'{game} age mean and standard deviation', np.mean(events['age']), np.std(events['age']))
+
+
+    events.loc[:, 'age'] = events['age'].clip(*game_info[game]['ages'])
     ages = events['age']
-
-
-    plt.hist(ages, bins=12, density=True)
+    plt.hist(ages, bins=len(ages.unique()), density=True)
     plt.xlabel('age')
     plt.ylabel('density')
-    plt.title(f'Age distribution for {game}')
+    plt.title(f'Lifetime age distribution for {game}')
+    xticks = sorted(ages.unique())
+    labels = [str(int(a)) for a in xticks]
+    labels[0] = '<=' + labels[0]
+    labels[-1] += '<=' 
+    plt.xticks(xticks, labels=labels)
     plt.show()
 
+def age_at_peak(game, events):
+    events = events[~events['age'].isnull()]
+    events.loc[:, 'age'] = events['age'].clip(*game_info[game]['ages'])
+    players = events.groupby('player').agg({'rating' : 'max'}).reset_index(level=0)
+    players = pd.merge(players, events, on=['player', 'rating'], how='inner')
+    ages = players['age']
+    plt.hist(ages, bins=len(ages.unique()), density=True)
+    plt.xlabel('age')
+    plt.ylabel('density')
+    plt.title(f'Age at TrueSkill peak distribution for {game}')
+    xticks = sorted(ages.unique())
+    labels = [str(int(a)) for a in xticks]
+    labels[0] = '<=' + labels[0]
+    labels[-1] += '<=' 
+    plt.xticks(xticks, labels=labels)
+    plt.show()
 
 
 
 def career_distribution(game, events):
     players = events.groupby('player').agg({'date' : ['min', 'max', 'count']})
-    print(len(players))
-    print(players.head(10))
+    print('num players:', len(players))
 
     players = players[players[('date', 'count')] >= 20]
     players['career_length'] = players[('date', 'max')] - players[('date', 'min')]
     career_length = players['career_length'].dt.total_seconds().values / (3600 * 24 * 365.25)
-    print(type(career_length))
-    print(len(career_length), career_length.dtype)
+    print(f'{game} mean career length {np.mean(career_length)}')
+    xticks = np.arange(career_length.max())
+    labels = [str(int(a)) for a in xticks]
+    plt.xticks(xticks, labels=labels)
 
-    plt.hist(career_length, bins=12, density=True)
-    plt.xlabel('career length')
+    plt.hist(career_length, density=True)
+    plt.xlabel('career length (years)')
     plt.ylabel('density')
     plt.title(f'Career length distribution for {game}')
     plt.show()
@@ -58,7 +82,7 @@ def career_distribution(game, events):
 
 def performance_distribution(game, events):
     events = events[~events['age'].isnull()]
-    events['age'] = events['age'].map(lambda age: np.clip(age, *game_info[game]['ages'])) 
+    events.loc[:,'age'] = events['age'].map(lambda age: np.clip(age, *game_info[game]['ages'])) 
     groups = events.groupby(events.age).agg({'rating' : ['mean', 'count'], 'win' : 'mean'})
     ages = groups[('rating', 'mean')].index.values
     ratings = groups[('rating', 'mean')].values
@@ -75,12 +99,12 @@ def performance_distribution(game, events):
     xticks[-1] += '<=' 
 
 
-    plt.plot(ages, ratings, linewidth=3, label=game)
-    plt.xlabel('age')
-    plt.ylabel('TrueSkill rating')
-    plt.title(f'TrueSkill rating by age for {game}')
-    plt.xticks(ages, labels=xticks)
-    plt.show()
+    # plt.plot(ages, ratings, linewidth=3, label=game)
+    # plt.xlabel('age')
+    # plt.ylabel('TrueSkill rating')
+    # plt.title(f'TrueSkill rating by age for {game}')
+    # plt.xticks(ages, labels=xticks)
+    # plt.show()
 
     plt.plot(ages, win_rates, linewidth=3, label=game)
     plt.xlabel('age')

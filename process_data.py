@@ -24,6 +24,7 @@ def main():
         player_df = pd.DataFrame(players_raw)[['pagename', 'birthdate']]
         player_df['pagename'] = player_df['pagename'].map(process_username)
         print(len(player_df), wiki, 'players')
+        print(len(player_df[player_df['birthdate'] != '1970-01-01']), wiki, 'players with known age')
         if wiki != 'smash':
             player_df.to_csv(f'data/processed/{wiki}_players.csv', index=False)
         else:
@@ -31,6 +32,7 @@ def main():
             player_df.to_csv(f'data/processed/smash_ultimate_players.csv', index=False)
 
         matches_raw = json.load(open(f'data/raw/{wiki}_matches.json', 'rb'))
+        print(f'{wiki} inital matches: {len(matches_raw)}')
         matches = []
         bad_cs = []
         for raw_match in matches_raw:

@@ -6,17 +6,21 @@ wikis = ['callofduty', 'counterstrike', 'warcraft', 'dota2', 'rocketleague', 'sm
 games = ['leagueoflegends', 'dota2', 'counterstrike', 'overwatch', 'rainbowsix', 'callofduty', 'valorant', \
          'rocketleague', 'smash_melee', 'smash_ultimate', 'starcraft', 'starcraft2', 'warcraft']
 
-mobas = ['leagueoflegends', 'dota2']
-shooters = ['counterstrike', 'overwatch', 'rainbowsix', 'callofduty', 'valorant']
-fighters = ['smash_melee', 'smash_ultimate']
-strategy = ['starcraft', 'starcraft2', 'warcraft']
-big = ['leagueoflegends', 'dota2', 'counterstrike', 'smash_melee', 'starcraft2']
+
+game_categories = {
+    'all' : games, 
+    'moba' : ['leagueoflegends', 'dota2'],
+    'shooting' : ['counterstrike', 'overwatch', 'rainbowsix', 'callofduty', 'valorant'],
+    'fighting' : ['smash_melee', 'smash_ultimate'],
+    'strategy' : ['starcraft', 'starcraft2', 'warcraft'],
+    'big' : ['leagueoflegends', 'dota2', 'counterstrike', 'smash_melee', 'starcraft2']
+}
 
 game_info = {
     'starcraft': {
         'team_size' : None,
         'years' : [2000, 2021],
-        'ages' : [15, 34]
+        'ages' : [15, 35]
     },
     'starcraft2': {
         'team_size' : None,
@@ -33,11 +37,11 @@ game_info = {
     },
     'smash_melee': {
         'years' : [2005, 2021],
-        'ages' : [16, 32]
+        'ages' : [16, 33]
     },
     'smash_ultimate': {
         'years': [2019, 2021],
-        'ages': [17, 29]
+        'ages': [16, 31]
     },
     'rocketleague': {
         'team_size' : 3,
@@ -57,7 +61,7 @@ game_info = {
     'valorant' : {
         'team_size': 5,
         'years': [2020, 2021],
-        'ages': [17, 29]
+        'ages': [17, 30]
     },
     'rainbowsix': {
         'team_size': 4,
