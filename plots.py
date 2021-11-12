@@ -26,16 +26,14 @@ def age_over_time(games, events_list):
 
 def age_distribution(game, events):
     events = events[~events['age'].isnull()]
-    groups = events.groupby('age').size()
-
-    print(groups)
+    ages = events['age']
 
 
-    # plt.hist(ages, density=True)
-    # plt.xlabel('career length')
-    # plt.ylabel('density')
-    # plt.title(f'Career length distribution for {game}')
-    # plt.show()
+    plt.hist(ages, bins=15, density=True)
+    plt.xlabel('age')
+    plt.ylabel('density')
+    plt.title(f'Age distribution for {game}')
+    plt.show()
 
 
 
@@ -51,7 +49,7 @@ def career_distribution(game, events):
     print(type(career_length))
     print(len(career_length), career_length.dtype)
 
-    plt.hist(career_length, density=True)
+    plt.hist(career_length, bins=12, density=True)
     plt.xlabel('career length')
     plt.ylabel('density')
     plt.title(f'Career length distribution for {game}')
